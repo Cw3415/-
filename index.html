@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="选择 AI 角色与 Prompt，观看一场自动结算的赛博对战。"
+    />
+    <title>PROMPT // ARENA</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="data.js" defer></script>
+    <script src="game.js" defer></script>
+    <script src="main.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient-grid" aria-hidden="true"></div>
+    <div class="ambient-glow ambient-glow--one" aria-hidden="true"></div>
+    <div class="ambient-glow ambient-glow--two" aria-hidden="true"></div>
+
+    <main class="app-shell">
+      <section
+        id="screen-mode"
+        class="screen screen--mode"
+        aria-labelledby="mode-title"
+      >
+        <header class="hero-header">
+          <div class="brand-lockup">
+            <span class="brand-mark" aria-hidden="true">
+              <span></span>
+              <span></span>
+            </span>
+            <span class="brand-text">PROMPT // ARENA</span>
+          </div>
+          <span class="system-status">
+            <i aria-hidden="true"></i>
+            SELECT PROTOCOL
+          </span>
+        </header>
+
+        <div class="mode-hero">
+          <p class="eyebrow">BATTLE PROTOCOL SELECTION / 00</p>
+          <h1 id="mode-title">
+            选择对战协议
+            <span>迎战系统生成的 AI。</span>
+          </h1>
+          <p>
+            当前提供单人人机对战。组建你的 AI 阵容，观察对手如何自动决策并反击。
+          </p>
+        </div>
+
+        <div class="mode-grid" role="group" aria-label="对战模式">
+          <button id="btn-mode-pve" class="mode-card mode-card--pve" type="button">
+            <span class="mode-card__index">MODE_01</span>
+            <span class="mode-card__sigil" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </span>
+            <span class="mode-card__copy">
+              <small>SOLO PROTOCOL</small>
+              <strong>PVE</strong>
+              <span>人机对战</span>
+              <em>你负责决策，AI 对手将根据生命值与能量自动行动。</em>
+            </span>
+            <span class="mode-card__action">START SOLO <b>→</b></span>
+          </button>
+
+          <button
+            id="btn-mode-online"
+            class="mode-card mode-card--online is-disabled"
+            type="button"
+            disabled
+            aria-disabled="true"
+          >
+            <span class="mode-card__index">MODE_02</span>
+            <span class="mode-card__sigil" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </span>
+            <span class="mode-card__copy">
+              <small>NETWORK PROTOCOL</small>
+              <strong>ONLINE</strong>
+              <span>联机对战</span>
+              <em>远程匹配与实时同步协议正在开发中。</em>
+            </span>
+            <span class="mode-card__action">COMING SOON <b>×</b></span>
+          </button>
+        </div>
+
+        <footer class="select-footer">
+          <span>SOLO SIMULATION</span>
+          <span class="footer-line" aria-hidden="true"></span>
+          <span>NO NETWORK REQUIRED</span>
+        </footer>
+      </section>
+
+      <section
+        id="screen-select"
+        class="screen screen--select"
+        aria-labelledby="select-title"
+      >
+        <header class="hero-header">
+          <div class="brand-lockup">
+            <span class="brand-mark" aria-hidden="true">
+              <span></span>
+              <span></span>
+            </span>
+            <span class="brand-text">PROMPT // ARENA</span>
+          </div>
+          <div class="header-actions">
+            <span class="system-status">
+              <i aria-hidden="true"></i>
+              SYSTEM ONLINE
+            </span>
+            <button id="btn-back-mode" class="icon-button" type="button">
+              <span aria-hidden="true">←</span>
+              模式选择
+            </button>
+          </div>
+        </header>
+
+        <div class="hero-copy">
+          <p id="select-eyebrow" class="eyebrow">
+            AUTONOMOUS BATTLE PROTOCOL / 01
+          </p>
+          <h1 id="select-title">
+            选择一个 AI
+            <span>定义战场规则。</span>
+          </h1>
+          <p id="select-description" class="hero-description">
+            每个模型拥有独立的战斗特性。选定你的核心，下一步再为它装载三项
+            Prompt。
+          </p>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <span class="section-index">01</span>
+            <h2 id="select-section-title">选择作战单元</h2>
+          </div>
+          <p>SELECT COMBAT UNIT</p>
+        </div>
+
+        <div
+          id="character-grid"
+          class="character-grid"
+          aria-label="AI 角色列表"
+        ></div>
+
+        <footer class="select-footer">
+          <span>04 AVAILABLE UNITS</span>
+          <span class="footer-line" aria-hidden="true"></span>
+          <span>CLICK TO DEPLOY</span>
+        </footer>
+      </section>
+
+      <section
+        id="screen-equip"
+        class="screen screen--equip"
+        aria-labelledby="equip-title"
+      >
+        <header class="inner-header">
+          <button
+            id="btn-back-select"
+            class="icon-button"
+            type="button"
+            aria-label="返回角色选择"
+          >
+            <span aria-hidden="true">←</span>
+            返回模式
+          </button>
+          <div class="step-indicator" aria-label="当前步骤 2，共 2 步">
+            <span class="is-complete"></span>
+            <span class="is-current"></span>
+          </div>
+          <span class="system-status">
+            <i aria-hidden="true"></i>
+            LOADOUT READY
+          </span>
+        </header>
+
+        <div class="equip-heading">
+          <div>
+            <p id="equip-eyebrow" class="eyebrow">LOADOUT CONFIGURATION / 02</p>
+            <h1 id="equip-title">装载 Prompt</h1>
+          </div>
+          <div class="selection-counter" aria-live="polite">
+            <strong id="prompt-count">0</strong>
+            <span>/ 3</span>
+            <small>SLOTS USED</small>
+          </div>
+        </div>
+
+        <div class="loadout-layout">
+          <aside class="selected-unit-panel">
+              <p id="selected-unit-label" class="panel-label">DEPLOYED CORE</p>
+            <div id="selected-character"></div>
+
+            <div class="protocol-note">
+              <span class="protocol-note__icon" aria-hidden="true">i</span>
+              <p>
+                点击 Prompt 装载或卸载。最多选择 3 项，装满后仍可点击已选项目进行替换。
+              </p>
+            </div>
+          </aside>
+
+          <div class="prompt-area">
+            <div class="prompt-area__header">
+              <div>
+                <p class="panel-label">RANDOMIZED MODIFIERS</p>
+                <h2>本局可用词条</h2>
+              </div>
+              <span class="drawn-badge">8 DRAWN</span>
+            </div>
+            <div
+              id="prompt-grid"
+              class="prompt-grid"
+              role="group"
+              aria-label="Prompt 词条列表"
+            ></div>
+            <div
+              id="active-bonds"
+              class="active-bonds"
+              aria-live="polite"
+            >
+              当前组合尚未激活羁绊
+            </div>
+          </div>
+        </div>
+
+        <div class="equip-actions">
+              <p id="loadout-hint">还需选择 3 个 Prompt</p>
+          <button id="btn-start-battle" class="primary-button" type="button" disabled>
+            <span id="start-battle-label">开始战斗</span>
+            <span class="button-arrow" aria-hidden="true">↗</span>
+          </button>
+        </div>
+      </section>
+
+      <section
+        id="screen-battle"
+        class="screen screen--battle"
+        aria-labelledby="battle-title"
+      >
+        <header class="battle-header">
+          <div class="brand-lockup brand-lockup--small">
+            <span class="brand-mark" aria-hidden="true">
+              <span></span>
+              <span></span>
+            </span>
+            <span class="brand-text">ARENA</span>
+          </div>
+
+          <div class="round-display">
+            <span>ROUND</span>
+            <strong id="round-value">00</strong>
+          </div>
+
+          <div class="battle-header-actions">
+            <div class="battle-status">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span id="battle-status-text">SIMULATION RUNNING</span>
+            </div>
+            <button
+              id="btn-settings"
+              class="settings-button"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="settings-modal"
+            >
+              <span aria-hidden="true">⚙</span>
+              设置
+            </button>
+          </div>
+        </header>
+
+        <div id="turn-phase-label" class="turn-phase-label">
+          <span>ACTION PHASE</span>
+          <strong>玩家操作阶段</strong>
+        </div>
+
+        <div id="global-event-banner" class="global-event-banner" hidden>
+          <span>SERVER WARNING</span>
+          <strong id="global-event-title">服务器警告</strong>
+          <small id="global-event-description"></small>
+        </div>
+
+        <div id="battle-title" class="battle-arena">
+          <div class="battle-side battle-side--player">
+            <div
+              id="player-panel"
+              class="combatant combatant--player"
+              data-fighter-id="player"
+            >
+              <div class="combatant__meta">
+                <span class="side-label">YOUR AGENT</span>
+                <span class="agent-role"></span>
+              </div>
+
+              <h2 data-fighter-name>GPT</h2>
+              <p class="trait-line" data-trait></p>
+
+              <div class="hp-status">
+                <div class="hp-label-row">
+                  <span>INTEGRITY</span>
+                  <strong data-hp-text>100 / 100</strong>
+                </div>
+                <div
+                  class="hp-track"
+                  role="progressbar"
+                  aria-label="玩家生命值"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="100"
+                >
+                  <span class="hp-fill" data-hp-bar></span>
+                  <span class="hp-scanline" aria-hidden="true"></span>
+                </div>
+                <div class="energy-readout">
+                  <span>ENERGY</span>
+                  <div class="energy-track" aria-hidden="true">
+                    <span data-energy-bar></span>
+                  </div>
+                  <strong data-energy-text>0 / 100</strong>
+                </div>
+                <div class="token-readout">
+                  <span>TOKEN</span>
+                  <div class="token-track" aria-hidden="true">
+                    <span data-token-bar></span>
+                  </div>
+                  <strong data-token-text>100 / 100</strong>
+                </div>
+              </div>
+
+              <div class="fighter-prompt-list" data-prompt-list></div>
+
+              <div class="attack-readout">
+                <span>ATK <strong data-atk>--</strong></span>
+                <span>DEF <strong data-def>--</strong></span>
+              </div>
+
+              <div class="avatar-stage">
+                <div class="avatar-rings" aria-hidden="true"></div>
+                <div class="battle-avatar" data-avatar aria-hidden="true">
+                  <span class="portrait-mirror">
+                    <img data-avatar-image alt="" />
+                    <span class="avatar-fallback" data-avatar-fallback></span>
+                  </span>
+                </div>
+                <div class="damage-layer" data-damage-layer></div>
+                <div
+                  id="player-trash-talk"
+                  class="trash-talk-bubble"
+                  role="status"
+                  aria-live="polite"
+                  hidden
+                ></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="versus-column">
+            <span class="versus-line"></span>
+            <div class="versus-mark">
+              <small>COMBAT</small>
+              <strong>VS</strong>
+              <span>01</span>
+            </div>
+            <div id="arena-round" class="arena-round">
+              <small>ROUND</small>
+              <strong>00</strong>
+            </div>
+            <span class="versus-line"></span>
+          </div>
+
+          <div class="battle-side battle-side--enemy">
+            <div
+              id="enemy-panel"
+              class="combatant combatant--enemy"
+              data-fighter-id="enemy"
+            >
+              <div class="combatant__meta">
+                <span class="agent-role"></span>
+                <span class="side-label">RIVAL AGENT</span>
+              </div>
+
+              <h2 data-fighter-name>Claude</h2>
+              <p class="trait-line" data-trait></p>
+
+              <div class="hp-status">
+                <div class="hp-label-row">
+                  <strong data-hp-text>150 / 150</strong>
+                  <span>INTEGRITY</span>
+                </div>
+                <div
+                  class="hp-track hp-track--enemy"
+                  role="progressbar"
+                  aria-label="敌方生命值"
+                  aria-valuemin="0"
+                  aria-valuemax="150"
+                  aria-valuenow="150"
+                >
+                  <span class="hp-fill" data-hp-bar></span>
+                  <span class="hp-scanline" aria-hidden="true"></span>
+                </div>
+                <div class="energy-readout">
+                  <span>ENERGY</span>
+                  <div class="energy-track" aria-hidden="true">
+                    <span data-energy-bar></span>
+                  </div>
+                  <strong data-energy-text>0 / 100</strong>
+                </div>
+                <div class="token-readout">
+                  <span>TOKEN</span>
+                  <div class="token-track" aria-hidden="true">
+                    <span data-token-bar></span>
+                  </div>
+                  <strong data-token-text>100 / 100</strong>
+                </div>
+              </div>
+
+              <div class="fighter-prompt-list" data-prompt-list></div>
+
+              <div class="attack-readout">
+                <span>ATK <strong data-atk>--</strong></span>
+                <span>DEF <strong data-def>--</strong></span>
+              </div>
+
+              <div class="avatar-stage">
+                <div class="avatar-rings" aria-hidden="true"></div>
+                <div class="battle-avatar" data-avatar aria-hidden="true">
+                  <span class="portrait-mirror">
+                    <img data-avatar-image alt="" />
+                    <span class="avatar-fallback" data-avatar-fallback></span>
+                  </span>
+                </div>
+                <div class="damage-layer" data-damage-layer></div>
+                <div
+                  id="enemy-trash-talk"
+                  class="trash-talk-bubble"
+                  role="status"
+                  aria-live="polite"
+                  hidden
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-bottom">
+        <section class="action-dock" aria-labelledby="action-dock-title">
+          <div class="current-operator">
+            <span>CURRENT OPERATOR</span>
+            <strong id="action-dock-title">玩家操作阶段</strong>
+            <small id="action-dock-hint">选择普通攻击，或使用已装载的主动 Prompt。</small>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              id="btn-basic-attack"
+              class="combat-action combat-action--basic"
+              type="button"
+              disabled
+            >
+              <span class="combat-action__icon" aria-hidden="true">⚔</span>
+              <span>
+                <small>BASIC ACTION</small>
+                普通攻击
+              </span>
+              <strong>+25 EP</strong>
+            </button>
+            <div id="skill-buttons" class="skill-buttons"></div>
+          </div>
+
+          <div id="current-energy" class="current-energy">
+            <span>ENERGY</span>
+            <strong>0</strong>
+            <small>/ 100</small>
+          </div>
+        </section>
+
+        <section class="battle-console" aria-label="战斗日志">
+          <header class="console-header">
+            <div>
+              <span class="console-dot" aria-hidden="true"></span>
+              <h2>战斗日志</h2>
+              <span class="console-code">EVENT_STREAM</span>
+            </div>
+            <button id="btn-clear-log" class="text-button" type="button">
+              清空
+            </button>
+          </header>
+          <div
+            id="battle-log"
+            class="battle-log"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+          >
+            <div class="log-placeholder">
+              <span>&gt;_</span>
+              正在等待战斗数据流…
+            </div>
+          </div>
+        </section>
+        </div>
+
+        <div id="vfx-layer" class="vfx-layer" aria-hidden="true"></div>
+
+        <div
+          id="settings-modal"
+          class="settings-overlay"
+          aria-hidden="true"
+        >
+          <div
+            class="settings-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="settings-title"
+          >
+            <header class="settings-card__header">
+              <div>
+                <p class="eyebrow">SYSTEM CONTROL / 03</p>
+                <h2 id="settings-title">设置</h2>
+              </div>
+              <button
+                id="btn-close-settings-top"
+                class="settings-close"
+                type="button"
+                aria-label="关闭设置"
+              >
+                ×
+              </button>
+            </header>
+
+            <p class="settings-description">
+              管理当前战斗状态。重置或离开前，系统会自动清理所有尚未执行的电脑行动。
+            </p>
+
+            <div class="api-key-panel">
+              <label for="deepseek-api-key">DEEPSEEK API KEY</label>
+              <div class="api-key-row">
+                <input
+                  id="deepseek-api-key"
+                  type="password"
+                  placeholder="sk-..."
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button id="btn-save-api-key" type="button">保存</button>
+              </div>
+              <small id="api-key-status">
+                Key 仅保存在当前浏览器的 localStorage 中，用于生成战斗垃圾话。
+              </small>
+            </div>
+
+            <div class="settings-actions">
+              <button id="btn-restart-match" class="settings-action" type="button">
+                <span class="settings-action__icon" aria-hidden="true">↻</span>
+                <span>
+                  <strong>重新开始</strong>
+                  <small>保留双方阵容，恢复满血并从玩家回合 1 重开</small>
+                </span>
+                <b>→</b>
+              </button>
+
+              <button id="btn-return-menu" class="settings-action" type="button">
+                <span class="settings-action__icon" aria-hidden="true">⌂</span>
+                <span>
+                  <strong>返回主菜单</strong>
+                  <small>结束当前对局，回到模式选择界面</small>
+                </span>
+                <b>→</b>
+              </button>
+            </div>
+
+            <button id="btn-close-settings" class="primary-button" type="button">
+              <span>关闭</span>
+              <span class="button-arrow" aria-hidden="true">×</span>
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="prompt-refresh-overlay"
+          class="refresh-overlay"
+          aria-hidden="true"
+        >
+          <div
+            class="refresh-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="refresh-title"
+          >
+            <header class="refresh-panel__header">
+              <div>
+                <p class="eyebrow">ROGUE PROTOCOL / MID BATTLE</p>
+                <h2 id="refresh-title">Prompt 重构</h2>
+                <p>
+                  选择一个新词条替代当前装备，或直接跳过。电脑会自动重组。
+                </p>
+              </div>
+              <span class="refresh-round" id="refresh-round">05</span>
+            </header>
+
+            <div class="refresh-event">
+              <span>GLOBAL EVENT</span>
+              <strong id="refresh-event-name">服务器事件</strong>
+              <p id="refresh-event-description"></p>
+            </div>
+
+            <div class="refresh-section">
+              <div class="refresh-section__title">
+                <h3>本次候补词条</h3>
+                <span>CHOOSE 01 / 05</span>
+              </div>
+              <div id="refresh-offer-grid" class="refresh-offer-grid"></div>
+            </div>
+
+            <div class="refresh-section">
+              <div class="refresh-section__title">
+                <h3>选择要替换的现有词条</h3>
+                <span>SELECT A SLOT</span>
+              </div>
+              <div id="refresh-current-list" class="refresh-current-list"></div>
+              <p id="refresh-hint" class="refresh-hint">
+                请先选择一个候补词条。
+              </p>
+            </div>
+
+            <button id="btn-skip-refresh" class="refresh-skip" type="button">
+              跳过本次替换
+              <span>电脑仍会自动重组</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div
+      id="screen-gameover"
+      class="gameover-overlay"
+      aria-hidden="true"
+    >
+      <article
+        id="gameover-card"
+        class="gameover-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gameover-title"
+      >
+        <span class="gameover-corner gameover-corner--tl" aria-hidden="true"></span>
+        <span class="gameover-corner gameover-corner--br" aria-hidden="true"></span>
+        <span class="gameover-scan" aria-hidden="true"></span>
+
+        <header class="gameover-header">
+          <p class="eyebrow">BATTLE REPORT / FINAL RESULT</p>
+          <h2 id="gameover-title">
+            <span class="gameover-title-en">VICTORY</span>
+            <span class="gameover-title-cn" id="gameover-title-cn">胜利</span>
+          </h2>
+          <p id="gameover-subtitle">作战记录已完成归档。</p>
+        </header>
+
+        <section class="gameover-stats" aria-label="战斗核心数据">
+          <div>
+            <span>总回合数</span>
+            <strong id="gameover-rounds">00</strong>
+          </div>
+          <div class="gameover-stats__main">
+            <span>玩家总输出伤害</span>
+            <strong id="gameover-total-damage">0</strong>
+          </div>
+          <div>
+            <span>对手总输出</span>
+            <strong id="gameover-enemy-damage">0</strong>
+          </div>
+        </section>
+
+        <section class="gameover-versus" aria-label="对战双方最终状态">
+          <div class="gameover-fighter gameover-fighter--player">
+            <div class="gameover-fighter__avatar">
+              <img id="gameover-player-avatar" alt="" />
+            </div>
+            <div>
+              <span>PLAYER / FINAL STATE</span>
+              <h3 id="gameover-player-name">GPT</h3>
+              <p>剩余 HP <strong id="gameover-player-hp">0</strong></p>
+            </div>
+          </div>
+
+          <div class="gameover-vs" aria-hidden="true">
+            <span></span>
+            VS
+            <span></span>
+          </div>
+
+          <div class="gameover-fighter gameover-fighter--enemy">
+            <div class="gameover-fighter__avatar">
+              <img id="gameover-enemy-avatar" alt="" />
+            </div>
+            <div>
+              <span>RIVAL / FINAL STATE</span>
+              <h3 id="gameover-enemy-name">Claude</h3>
+              <p>剩余 HP <strong id="gameover-enemy-hp">0</strong></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="gameover-loadout">
+          <p>本局装备词条</p>
+          <div id="gameover-player-prompts" class="gameover-prompt-tags"></div>
+        </section>
+
+        <footer class="gameover-actions">
+          <button id="btn-gameover-replay" class="primary-button" type="button">
+            <span>再来一局</span>
+            <span class="button-arrow" aria-hidden="true">↻</span>
+          </button>
+          <button id="btn-gameover-lobby" class="gameover-lobby-button" type="button">
+            <span>返回大厅</span>
+            <span aria-hidden="true">←</span>
+          </button>
+        </footer>
+      </article>
+    </div>
+  </body>
+</html>
